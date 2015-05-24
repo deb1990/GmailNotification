@@ -1,8 +1,13 @@
 var app = require('app');
-var Menu = require('menu');
-var Tray = require('tray');
-var BrowserWindow = require('browser-window');
 var ipc = require('ipc');
+
+var gmail = require('./bin/gmailNotification.js');
+
+app.on('ready', function () {
+    gmail.init();
+    ipc.on('email-count', gmail.emailCount);
+});
+
 
 
 //var express = require('express'),
@@ -19,39 +24,3 @@ var ipc = require('ipc');
 //    // output is in stdout
 //    console.log(error, stdout, stderr)
 //});
-var appIcon = null;
-ipc.on('asynchronous-message', function(event, arg) {
-    console.log(arg);  // prints "ping"
-    //appIcon = new Tray('/path/to/my/icon');
-    appIcon.displayBalloon({
-        icon: 'icon.png',
-        title : 'Gmail',
-        content: arg.toString() + ' new Messages'
-    });
-    appIcon.setToolTip('Fetching Info');
-});
-
-
-
-
-
-
-app.on('ready', function () {
-    appIcon = new Tray('icon.png');
-    appIcon.setToolTip('Fetching Info');
-
-
-    var mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
-        //"skip-taskbar": true,
-        //show: false
-    });
-
-    // and load the index.html of the app.
-    mainWindow.openDevTools();
-    mainWindow.loadUrl('http://localhost:8080');
-    //mainWindow.reloadIgnoringCache();
-
-
-});

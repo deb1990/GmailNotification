@@ -20,7 +20,7 @@
                         });
                         request.execute(function (data) {
                             console.log(data);
-                            ipc.send('asynchronous-message', data.messages.length);
+                            ipc.send('email-count', data.messages.length);
                         });
                     });
         }
