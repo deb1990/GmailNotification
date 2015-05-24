@@ -1,0 +1,38 @@
+<html>
+<head>
+
+    <script>
+        var CLIENT_ID = '786818281110-shpj4ld9gt8hmn3np9ukdeg2bt33rfuc.apps.googleusercontent.com';
+        var SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
+        var ipc = require('ipc');
+        function makeRequest() {
+            gapi.auth.authorize(
+                    {
+                        'client_id': CLIENT_ID,
+                        'scope': SCOPES,
+                        'immediate': true
+                    },
+                    function () {
+                        var request = gapi.client.gmail.users.messages.list({
+                            'userId': 'me',
+                            'q': "is:unread label:inbox",
+                            'maxResults': 500
+                        });
+                        request.execute(function (data) {
+                            console.log(data);
+                            ipc.send('asynchronous-message', data.messages.length);
+                        });
+                    });
+        }
+
+        function init() {
+            gapi.client.setApiKey('AIzaSyA9-vPhCtE0LsyYprghyXiyX9v1ytEtXBA');
+            gapi.client.load('gmail', 'v1').then(makeRequest);
+        }
+    </script>
+    <script src="https://apis.google.com/js/client.js?onload=init"></script>
+</head>
+<body>
+<div id="results"></div>
+</body>
+</html>
