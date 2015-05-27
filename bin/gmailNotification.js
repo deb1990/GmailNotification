@@ -24,8 +24,8 @@ var gmailNotification = {
         this.browserInstance = new BrowserWindow({
             width: 800,
             height: 600,
-            //"skip-taskbar": true,
-            //show: false
+            "skip-taskbar": true,
+            show: false
         });
         this.browserInstance.loadUrl(this.url);
         this.browserInstance.openDevTools();
