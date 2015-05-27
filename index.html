@@ -76,10 +76,20 @@
 
 
     function readMsgContent(ids) {
+        var msgContents=[];
         for (var i = 0; i < ids.length; i++) {
-            var request = gapi.client.gmail.users.messages.get({'id': ids[i]});
+            var request = gapi.client.gmail.users.messages.get({
+                'id': ids[i],
+                userId: 'me'
+            });
             request.execute(function (data) {
-                console.log(data);
+                msgContents.push({
+                    snippet: data.snippet,
+                    data: data.payload.headers
+                })
+                if(msgContents.length === ids.length){
+                    ipc.send('messageinfo_tomain', msgContents);
+                }
             });
         }
 

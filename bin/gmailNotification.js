@@ -33,7 +33,7 @@ var gmailNotification = {
             width: 800,
             height: 600,
             "skip-taskbar": true,
-            //show: false
+            show: false
         });
         this.browserInstance.loadUrl(this.url);
         this.browserInstance.openDevTools();
@@ -47,24 +47,27 @@ var gmailNotification = {
         if (arg.firstMsg) {
             gmailNotification.lastEmailId = messages[0].id;
             gmailNotification.showUnreadMsgCount(count);
+            gmailNotification.appIcon.instance.setToolTip(count + ' new emails');
         }
         else {
             if (count > 0) {
+                gmailNotification.appIcon.instance.setToolTip(count + ' new emails');
                 for (var i = 0; i < messages.length; i++) {
                     if (messages[i].id === gmailNotification.lastEmailId) {
                         if (i > 0) {
                             var idArr = [];
-                            for (var j = 0; j <= i; i++) {
+                            for (var j = 0; j < i; j++) {
                                 idArr.push(messages[j].id)
                             }
-                            ipc.send('messageinfo_torend', idArr);
+                            console.log(j);
+                            gmailNotification.browserInstance.webContents.send('messageinfo_torend', idArr);
                             txt = i + ' new message';
                             gmailNotification.appIcon.displayBallon('icon.png', 'Gmail', txt);
-                            gmailNotification.lastEmailId = messages[0].id;
                         }
                         return;
                     }
                 }
+                gmailNotification.lastEmailId = messages[0].id;
             }
         }
 
@@ -80,6 +83,25 @@ var gmailNotification = {
             txt = 'You have ' + count + ' unread messages';
         }
         this.appIcon.displayBallon('icon.png', 'Gmail', txt);
+    },
+    showMsgPopUp: function (event, msgs) {
+        var data = msgs;
+
+        var txt = "",
+            sub,
+            from;
+        for (var i = 0; i < data.length; i++) {
+            for (var j = 0; j < data[i].data.length; j++) {
+                if (data[i].data[j].name === "From") {
+                    from = data[i].data[j].value + '\n';
+                }
+                if (data[i].data[j].name === "Subject") {
+                    sub = 'Subject: ' + data[i].data[j].value + '\n';
+                }
+            }
+            txt += from + sub + data[i].snippet + '\n';
+        }
+        gmailNotification.appIcon.displayBallon('icon.png', 'New email', txt);
     }
 };
 module.exports = gmailNotification;

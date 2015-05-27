@@ -26,5 +26,6 @@ app.on('ready', function () {
 function start() {
     gmail.init();
     ipc.on('email-count', gmail.emailCount);
+    ipc.on('messageinfo_tomain', gmail.showMsgPopUp);
 }
 
