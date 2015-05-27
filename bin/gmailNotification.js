@@ -24,7 +24,7 @@ var gmailNotification = {
         this.appIcon.instance = new Tray(this.appIcon.icon);
 
         var contextMenu = Menu.buildFromTemplate([
-            { label: 'Exit' }
+            {label: 'Exit'}
         ]);
         this.appIcon.instance.setContextMenu(contextMenu);
 
@@ -33,7 +33,7 @@ var gmailNotification = {
             width: 800,
             height: 600,
             "skip-taskbar": true,
-            show: false
+            //show: false
         });
         this.browserInstance.loadUrl(this.url);
         this.browserInstance.openDevTools();
@@ -44,17 +44,20 @@ var gmailNotification = {
             messages = arg.messages,
             count = arg.count;
 
-        if(arg.firstMsg){
+        if (arg.firstMsg) {
             gmailNotification.lastEmailId = messages[0].id;
             gmailNotification.showUnreadMsgCount(count);
         }
-        else{
-            if(count>0){
+        else {
+            if (count > 0) {
                 for (var i = 0; i < messages.length; i++) {
-                    if(messages[i].id === gmailNotification.lastEmailId){
-                        if(i > 0) {
-                            for(var j=0;j<=i;i++)
-                            ipc.send('get-message-info', 'ping');
+                    if (messages[i].id === gmailNotification.lastEmailId) {
+                        if (i > 0) {
+                            var idArr = [];
+                            for (var j = 0; j <= i; i++) {
+                                idArr.push(messages[j].id)
+                            }
+                            ipc.send('messageinfo_torend', idArr);
                             txt = i + ' new message';
                             gmailNotification.appIcon.displayBallon('icon.png', 'Gmail', txt);
                             gmailNotification.lastEmailId = messages[0].id;
@@ -66,14 +69,14 @@ var gmailNotification = {
         }
 
     },
-    showUnreadMsgCount: function(count){
+    showUnreadMsgCount: function (count) {
         if (count === 100) {
             txt = 'You have 100+ unread messages'
         }
-        else if(count === 0){
+        else if (count === 0) {
             txt = 'You have no unread messages';
         }
-        else{
+        else {
             txt = 'You have ' + count + ' unread messages';
         }
         this.appIcon.displayBallon('icon.png', 'Gmail', txt);

@@ -7,6 +7,7 @@
     var CLIENT_ID = '786818281110-shpj4ld9gt8hmn3np9ukdeg2bt33rfuc.apps.googleusercontent.com';
     var SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
     var ipc = require('ipc');
+    ipc.on('messageinfo_torend', readMsgContent);
     function makeRequest() {
         gapi.auth.authorize(
                 {
