@@ -34,19 +34,43 @@
                             'maxResults': 500
                         });
                         request.execute(function (data) {
-                            if(data.messages){
-                                ipc.send('email-count', data.messages.length);
-                            }else{
-                                ipc.send('email-count', 0);
+                            if (data.messages) {
+                                ipc.send('email-count', {
+                                    messages: data.messages,
+                                    count: data.messages.length,
+                                    firstMsg: true
+                                });
+                            } else {
+                                ipc.send('email-count', {
+                                    messages: [],
+                                    count: 0
+                                });
                             }
+                            setInterval(repeat,5000)
                         });
                     }
                 });
     }
 
+    function repeat(){
+        var request = gapi.client.gmail.users.messages.list({
+            'userId': 'me',
+            'q': "is:unread label:inbox",
+            'maxResults': 500
+        });
+        request.execute(function (data) {
+            if (data.messages) {
+                ipc.send('email-count', {
+                    messages: data.messages,
+                    count: data.messages.length
+                });
+            }
+        });
+    }
+
     function init() {
         gapi.client.setApiKey('AIzaSyA9-vPhCtE0LsyYprghyXiyX9v1ytEtXBA');
-        gapi.client.load('gmail', 'v1').then(setTimeout(makeRequest,2000));
+        gapi.client.load('gmail', 'v1').then(setTimeout(makeRequest, 2000));
     }
 </script>
 <script src="https://apis.google.com/js/client.js?onload=init"></script>

@@ -7,16 +7,15 @@ app.on('ready', function () {
     var exec = require('child_process').exec;
     exec('netstat -a -n -o | find "12346"', function (error, stdout, stderr) {
         if (stdout.indexOf('LISTENING') !== -1) {
-            var p = stdout.split('   '),
-                processID = parseInt(p[p.length - 1]);
-            exec("Taskkill /PID "+processID+" /F", function (error, stdout, stderr) {
+            var processID = parseInt(stdout.substr(stdout.indexOf('LISTENING') + 'LISTENING'.length));
+            exec("Taskkill /PID " + processID + " /F", function (error, stdout, stderr) {
                 console.log('taskKilled');
                 exec("'cd ' + __dirname + ' & http-server -p 12346 -c-1'", function (error, stdout, stderr) {
                 });
                 start();
             });
         }
-        else{
+        else {
             exec("'cd ' + __dirname + ' & http-server -p 12346 -c-1'", function (error, stdout, stderr) {
             });
             start();
@@ -24,7 +23,7 @@ app.on('ready', function () {
     });
 });
 
-function start(){
+function start() {
     gmail.init();
     ipc.on('email-count', gmail.emailCount);
 }

@@ -31,21 +31,49 @@ var gmailNotification = {
         this.browserInstance = new BrowserWindow({
             width: 800,
             height: 600,
-            //"skip-taskbar": true,
-            //show: false
+            "skip-taskbar": true,
+            show: false
         });
         this.browserInstance.loadUrl(this.url);
         this.browserInstance.openDevTools();
     },
+    lastEmailId: null,
     emailCount: function (event, arg) {
-        var msg;
-        if (arg === 100) {
-            msg = 'You have 100+ unread messages'
+        var txt,
+            messages = arg.messages,
+            count = arg.count;
+
+        if(arg.firstMsg){
+            gmailNotification.lastEmailId = messages[0].id;
+            gmailNotification.showUnreadMsgCount(count);
         }
-        else {
-            msg = 'You have ' + arg + ' unread messages';
+        else{
+            if(count>0){
+                for (var i = 0; i < messages.length; i++) {
+                    if(messages[i].id === gmailNotification.lastEmailId){
+                        if(i > 0) {
+                            txt = i + ' new message';
+                            gmailNotification.appIcon.displayBallon('icon.png', 'Gmail', txt);
+                            gmailNotification.lastEmailId = messages[0].id;
+                        }
+                        return;
+                    }
+                }
+            }
         }
-        gmailNotification.appIcon.displayBallon('icon.png', 'Gmail', msg);
+
+    },
+    showUnreadMsgCount: function(count){
+        if (count === 100) {
+            txt = 'You have 100+ unread messages'
+        }
+        else if(count === 0){
+            txt = 'You have no unread messages';
+        }
+        else{
+            txt = 'You have ' + count + ' unread messages';
+        }
+        this.appIcon.displayBallon('icon.png', 'Gmail', txt);
     }
 };
 module.exports = gmailNotification;
