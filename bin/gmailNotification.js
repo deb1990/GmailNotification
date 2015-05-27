@@ -62,6 +62,7 @@ var gmailNotification = {
                             gmailNotification.browserInstance.webContents.send('messageinfo_torend', idArr);
                             txt = i + ' new message';
                             gmailNotification.appIcon.displayBallon('icon.png', 'Gmail', txt);
+                            gmailNotification.lastEmailId = messages[0].id;
                         }
                         return;
                     }
