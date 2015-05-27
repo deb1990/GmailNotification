@@ -16,7 +16,7 @@ var gmailNotification = {
             })
         }
     },
-    url: 'http://localhost:8080',
+    url: 'http://localhost:12346',
     browserInstance: null,
     init: function () {
         this.appIcon.instance = new Tray(this.appIcon.icon);
