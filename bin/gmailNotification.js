@@ -3,6 +3,7 @@
  */
 var Tray = require('tray');
 var BrowserWindow = require('browser-window');
+var ipc = require('ipc');
 var Menu = require('menu');
 var gmailNotification = {
     appIcon: {
@@ -52,6 +53,8 @@ var gmailNotification = {
                 for (var i = 0; i < messages.length; i++) {
                     if(messages[i].id === gmailNotification.lastEmailId){
                         if(i > 0) {
+                            for(var j=0;j<=i;i++)
+                            ipc.send('get-message-info', 'ping');
                             txt = i + ' new message';
                             gmailNotification.appIcon.displayBallon('icon.png', 'Gmail', txt);
                             gmailNotification.lastEmailId = messages[0].id;
