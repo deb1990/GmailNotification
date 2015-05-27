@@ -3,6 +3,7 @@
  */
 var Tray = require('tray');
 var BrowserWindow = require('browser-window');
+var Menu = require('menu');
 var gmailNotification = {
     appIcon: {
         icon: 'icon.png',
@@ -20,12 +21,18 @@ var gmailNotification = {
     browserInstance: null,
     init: function () {
         this.appIcon.instance = new Tray(this.appIcon.icon);
+
+        var contextMenu = Menu.buildFromTemplate([
+            { label: 'Exit' }
+        ]);
+        this.appIcon.instance.setContextMenu(contextMenu);
+
         this.appIcon.instance.setToolTip(this.appIcon.toolTip);
         this.browserInstance = new BrowserWindow({
             width: 800,
             height: 600,
-            "skip-taskbar": true,
-            show: false
+            //"skip-taskbar": true,
+            //show: false
         });
         this.browserInstance.loadUrl(this.url);
         this.browserInstance.openDevTools();

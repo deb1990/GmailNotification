@@ -3,8 +3,7 @@ Desktop notification for emails using Github Electron API.
 
 ###Quick Start
 
-1. Start a server by running **http-server -p 12346 -c-1**
-2. Run the app using **npm start**
+1. Run the app using **npm start**
 
 You should be able to see *ballon notification*
 
