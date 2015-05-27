@@ -59,7 +59,6 @@ var gmailNotification = {
                             for (var j = 0; j < i; j++) {
                                 idArr.push(messages[j].id)
                             }
-                            console.log(j);
                             gmailNotification.browserInstance.webContents.send('messageinfo_torend', idArr);
                             txt = i + ' new message';
                             gmailNotification.appIcon.displayBallon('icon.png', 'Gmail', txt);
