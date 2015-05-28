@@ -1,34 +1,20 @@
 /**
  * Created by Debarshi on 5/24/2015.
  */
-var Tray = require('tray');
 var BrowserWindow = require('browser-window');
 var ipc = require('ipc');
-var Menu = require('menu');
+
+var TrayIcon = require('./class/TrayIcon.js');
+
 var gmailNotification = {
-    appIcon: {
-        icon: 'icon.png',
-        toolTip: 'Fetching Info',
-        instance: null,
-        displayBallon: function (icon, title, content) {
-            this.instance.displayBalloon({
-                icon: icon,
-                title: title,
-                content: content
-            })
-        }
-    },
+    trayIcon: null,
     url: 'http://localhost:12346',
+    appInstance: null,
     browserInstance: null,
-    init: function () {
-        this.appIcon.instance = new Tray(this.appIcon.icon);
+    init: function (appInstance) {
+        this.appInstance = appInstance;
+        this.trayIcon = new TrayIcon('icon.png', this.appInstance);
 
-        var contextMenu = Menu.buildFromTemplate([
-            {label: 'Exit'}
-        ]);
-        this.appIcon.instance.setContextMenu(contextMenu);
-
-        this.appIcon.instance.setToolTip(this.appIcon.toolTip);
         this.browserInstance = new BrowserWindow({
             width: 800,
             height: 600,
@@ -45,29 +31,29 @@ var gmailNotification = {
             count = arg.count;
 
         if (arg.firstMsg) {
-            gmailNotification.lastEmailId = messages[0].id;
-            gmailNotification.showUnreadMsgCount(count);
-            gmailNotification.appIcon.instance.setToolTip(count + ' new emails');
+            this.lastEmailId = messages[0].id;
+            this.showUnreadMsgCount(count);
+            this.trayIcon.setToolTip(count + ' new emails');
         }
         else {
             if (count > 0) {
-                gmailNotification.appIcon.instance.setToolTip(count + ' new emails');
+                this.trayIcon.setToolTip(count + ' new emails');
                 for (var i = 0; i < messages.length; i++) {
-                    if (messages[i].id === gmailNotification.lastEmailId) {
+                    if (messages[i].id === this.lastEmailId) {
                         if (i > 0) {
                             var idArr = [];
                             for (var j = 0; j < i; j++) {
                                 idArr.push(messages[j].id)
                             }
-                            gmailNotification.browserInstance.webContents.send('messageinfo_torend', idArr);
+                            this.browserInstance.webContents.send('messageinfo_torend', idArr);
                             txt = i + ' new message';
-                            gmailNotification.appIcon.displayBallon('icon.png', 'Gmail', txt);
-                            gmailNotification.lastEmailId = messages[0].id;
+                            this.trayIcon.showDisplayBallon('icon.png', 'Gmail', txt);
+                            this.lastEmailId = messages[0].id;
                         }
                         return;
                     }
                 }
-                gmailNotification.lastEmailId = messages[0].id;
+                this.lastEmailId = messages[0].id;
             }
         }
 
@@ -82,7 +68,7 @@ var gmailNotification = {
         else {
             txt = 'You have ' + count + ' unread messages';
         }
-        this.appIcon.displayBallon('icon.png', 'Gmail', txt);
+        this.trayIcon.showDisplayBallon('icon.png', 'Gmail', txt);
     },
     showMsgPopUp: function (event, msgs) {
         var data = msgs;
@@ -101,7 +87,7 @@ var gmailNotification = {
             }
             txt += from + sub + data[i].snippet + '\n';
         }
-        gmailNotification.appIcon.displayBallon('icon.png', 'New email', txt);
+        this.trayIcon.showDisplayBallon('icon.png', 'New email', txt);
     }
 };
 module.exports = gmailNotification;

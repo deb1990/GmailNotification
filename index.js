@@ -24,8 +24,8 @@ app.on('ready', function () {
 });
 
 function start() {
-    gmail.init();
-    ipc.on('email-count', gmail.emailCount);
-    ipc.on('messageinfo_tomain', gmail.showMsgPopUp);
+    gmail.init(app);
+    ipc.on('email-count', gmail.emailCount.bind(gmail));
+    ipc.on('messageinfo_tomain', gmail.showMsgPopUp.bind(gmail));
 }
 
