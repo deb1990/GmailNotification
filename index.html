@@ -7,93 +7,103 @@
     var CLIENT_ID = '786818281110-shpj4ld9gt8hmn3np9ukdeg2bt33rfuc.apps.googleusercontent.com';
     var SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
     var ipc = require('ipc');
-    ipc.on('messageinfo_torend', readMsgContent);
-    function makeRequest() {
-        gapi.auth.authorize(
-                {
-                    'client_id': CLIENT_ID,
-                    'scope': SCOPES,
-                    'immediate': false
-                });
-        setTimeout(getInfo, 2000);
-    }
-    function getInfo() {
-        gapi.auth.authorize(
-                {
-                    'client_id': CLIENT_ID,
-                    'scope': SCOPES,
-                    'immediate': true
-                },
-                function (res) {
-                    if (res.error) {
-                        setTimeout(getInfo, 2000);
-                    }
-                    else {
-                        var request = gapi.client.gmail.users.messages.list({
-                            'userId': 'me',
-                            'q': "is:unread label:inbox",
-                            'maxResults': 500
-                        });
-                        request.execute(function (data) {
-                            if (data.messages) {
-                                ipc.send('email-count', {
-                                    messages: data.messages,
-                                    count: data.messages.length,
-                                    firstMsg: true
-                                });
-                            } else {
-                                ipc.send('email-count', {
-                                    messages: [],
-                                    count: 0
-                                });
-                            }
-                            setInterval(repeat, 5000)
-                        });
-                    }
-                });
-    }
-
-    function repeat() {
-        var request = gapi.client.gmail.users.messages.list({
-            'userId': 'me',
-            'q': "is:unread label:inbox",
-            'maxResults': 500
-        });
-        request.execute(function (data) {
-            if (data.messages) {
-                ipc.send('email-count', {
-                    messages: data.messages,
-                    count: data.messages.length
-                });
-            }
-        });
-    }
-
-    function init() {
-        gapi.client.setApiKey('AIzaSyA9-vPhCtE0LsyYprghyXiyX9v1ytEtXBA');
-        gapi.client.load('gmail', 'v1').then(setTimeout(makeRequest, 2000));
-    }
-
-
-    function readMsgContent(ids) {
-        var msgContents=[];
-        for (var i = 0; i < ids.length; i++) {
-            var request = gapi.client.gmail.users.messages.get({
-                'id': ids[i],
-                userId: 'me'
+    var gmailPoll = {
+        init: function () {
+            gapi.client.setApiKey('AIzaSyA9-vPhCtE0LsyYprghyXiyX9v1ytEtXBA');
+            gapi.client.load('gmail', 'v1').then(setTimeout(gmailPoll.makeRequest, 2000));
+        },
+        makeRequest: function () {
+            gapi.auth.authorize(
+                    {
+                        'client_id': CLIENT_ID,
+                        'scope': SCOPES,
+                        'immediate': false
+                    });
+            setTimeout(gmailPoll.getInfo, 3000);
+        },
+        getInfo: function () {
+            gapi.auth.authorize(
+                    {
+                        'client_id': CLIENT_ID,
+                        'scope': SCOPES,
+                        'immediate': true
+                    },
+                    function (res) {
+                        if (res.error) {
+                            setTimeout(gmailPoll.getInfo, 3000);
+                        }
+                        else {
+                            var request = gapi.client.gmail.users.messages.list({
+                                'userId': 'me',
+                                'q': "is:unread label:inbox",
+                                'maxResults': 500
+                            });
+                            request.execute(function (data) {
+                                if (data.messages) {
+                                    ipc.send('email-count', {
+                                        messages: data.messages,
+                                        count: data.messages.length,
+                                        firstMsg: true
+                                    });
+                                } else {
+                                    ipc.send('email-count', {
+                                        messages: [],
+                                        count: 0,
+                                        firstMsg: true
+                                    });
+                                }
+                                setInterval(gmailPoll.pollForNewEmail, 5000)
+                            });
+                        }
+                    });
+        },
+        pollForNewEmail: function () {
+            var request = gapi.client.gmail.users.messages.list({
+                'userId': 'me',
+                'q': "is:unread label:inbox",
+                'maxResults': 500
             });
             request.execute(function (data) {
-                msgContents.push({
-                    snippet: data.snippet,
-                    data: data.payload.headers
-                })
-                if(msgContents.length === ids.length){
-                    ipc.send('messageinfo_tomain', msgContents);
+                if (data.messages) {
+                    ipc.send('email-count', {
+                        messages: data.messages,
+                        count: data.messages.length
+                    });
+                }
+                else{
+                    ipc.send('email-count', {
+                        messages: data.messages,
+                        count: 0
+                    });
                 }
             });
-        }
+        },
+        readMsgContent: function (ids) {
+            var msgContents = [];
+            for (var i = 0; i < ids.length; i++) {
+                var request = gapi.client.gmail.users.messages.get({
+                    'id': ids[i],
+                    userId: 'me'
+                });
+                request.execute(function (data) {
+                    msgContents.push({
+                        snippet: data.snippet,
+                        data: data.payload.headers
+                    })
+                    if (msgContents.length === ids.length) {
+                        ipc.send('messageinfo_tomain', msgContents);
+                    }
+                });
+            }
 
+        }
+    };
+    ipc.on('messageinfo_torend', gmailPoll.readMsgContent);
+    function init(){
+        gmailPoll.init();
     }
+
+
 </script>
 <script src="https://apis.google.com/js/client.js?onload=init"></script>
 <div id="results"></div>

@@ -9,14 +9,14 @@ app.on('ready', function () {
         if (stdout.indexOf('LISTENING') !== -1) {
             var processID = parseInt(stdout.substr(stdout.indexOf('LISTENING') + 'LISTENING'.length));
             exec("Taskkill /PID " + processID + " /F", function (error, stdout, stderr) {
-                console.log('taskKilled');
-                exec("'cd ' + __dirname + ' & http-server -p 12346 -c-1'", function (error, stdout, stderr) {
+                console.log('taskKilled:' +processID);
+                exec('cd ' + __dirname + ' & http-server -p 12346 -c-1', function (error, stdout, stderr) {
                 });
                 start();
             });
         }
         else {
-            exec("'cd ' + __dirname + ' & http-server -p 12346 -c-1'", function (error, stdout, stderr) {
+            exec('cd ' + __dirname + ' & http-server -p 12346 -c-1', function (error, stdout, stderr) {
             });
             start();
         }

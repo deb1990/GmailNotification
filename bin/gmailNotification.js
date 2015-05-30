@@ -21,7 +21,15 @@ var gmailNotification = {
             "skip-taskbar": true,
             show: false
         });
-        this.browserInstance.loadUrl(this.url);
+        this.browserInstance.webContents.loadUrl(this.url);
+        this.loaded = false;
+        this.browserInstance.webContents.on('dom-ready', function(){
+            if(!this.loaded) {
+                this.loaded = true;
+                this.browserInstance.webContents.reloadIgnoringCache();
+            }
+        }.bind(this));
+
         this.browserInstance.openDevTools();
     },
     lastEmailId: null,
@@ -31,29 +39,46 @@ var gmailNotification = {
             count = arg.count;
 
         if (arg.firstMsg) {
-            this.lastEmailId = messages[0].id;
+            if(messages[0]) {
+                this.lastEmailId = messages[0].id;
+            }
             this.showUnreadMsgCount(count);
             this.trayIcon.setToolTip(count + ' new emails');
         }
         else {
             if (count > 0) {
                 this.trayIcon.setToolTip(count + ' new emails');
-                for (var i = 0; i < messages.length; i++) {
-                    if (messages[i].id === this.lastEmailId) {
-                        if (i > 0) {
-                            var idArr = [];
-                            for (var j = 0; j < i; j++) {
-                                idArr.push(messages[j].id)
+                if(!this.lastEmailId){
+                    var idArr = [];
+                    for (var i = 0; i < messages.length; i++) {
+                        idArr.push(messages[i].id);
+                    }
+                    this.browserInstance.webContents.send('messageinfo_torend', idArr);
+                    txt = i + ' new message';
+                    this.trayIcon.showDisplayBallon('icon.png', 'Gmail', txt);
+                    this.lastEmailId = messages[0].id;
+                }
+                else {
+                    for (var i = 0; i < messages.length; i++) {
+                        if (messages[i].id === this.lastEmailId) {
+                            if (i > 0) {
+                                var idArr = [];
+                                for (var j = 0; j < i; j++) {
+                                    idArr.push(messages[j].id)
+                                }
+                                this.browserInstance.webContents.send('messageinfo_torend', idArr);
+                                txt = i + ' new message';
+                                this.trayIcon.showDisplayBallon('icon.png', 'Gmail', txt);
+                                this.lastEmailId = messages[0].id;
                             }
-                            this.browserInstance.webContents.send('messageinfo_torend', idArr);
-                            txt = i + ' new message';
-                            this.trayIcon.showDisplayBallon('icon.png', 'Gmail', txt);
-                            this.lastEmailId = messages[0].id;
+                            return;
                         }
-                        return;
                     }
                 }
-                this.lastEmailId = messages[0].id;
+            }
+            else{
+                this.trayIcon.setToolTip(count + ' new emails');
+                this.lastEmailId = null;
             }
         }
 
