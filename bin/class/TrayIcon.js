@@ -64,7 +64,12 @@ var TrayIcon = (function () {
     };
     TrayIcon.prototype.showMail = function () {
         if (this._mailWindowInstance) {
-            this._mailWindowInstance.destroy();
+            if(!this._mailWindowInstance.isVisible()){
+                this._mailWindowInstance.destroy();
+            }
+            else{
+                return;
+            }
         }
         var BrowserWindow = require('browser-window');
         this._mailWindowInstance = new BrowserWindow({
