@@ -8,7 +8,7 @@ var TrayIcon = require('./class/TrayIcon.js');
 
 var gmailNotification = {
     trayIcon: null,
-    url: 'http://localhost:12346',
+    url: 'http://localhost:12346/resources/serve/',
     appInstance: null,
     browserInstance: null,
     init: function (appInstance) {

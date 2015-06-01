@@ -11,21 +11,36 @@ module.exports = function (grunt) {
                         expand: true,
                         src: [
                             'bin/**/*',
-                            'icon.png',
-                            'index.html',
                             'index.js',
                             'package.json',
                         ],
                         dest: 'node_modules/electron-prebuilt/dist/resources/app/'
                     }
-                ],
+                ]
+            },
+            others: {
+                files: [
+                    {
+                        expand: true,
+                        src: [
+                            'index.html',
+                            'icon.png'
+                        ],
+                        dest: 'node_modules/electron-prebuilt/dist/resources/serve/'
+                    }
+                ]
             },
         },
+        exec: {
+            asar_package: 'cd node_modules/electron-prebuilt/dist/resources && asar pack app app.asar'
+        },
+        clean: ["node_modules/electron-prebuilt/dist/resources/app/"]
 
     });
 
 
     grunt.loadNpmTasks('grunt-contrib-copy');
-
-    grunt.registerTask('default', ['copy']);
+    grunt.loadNpmTasks('grunt-exec');
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.registerTask('default', ['copy', 'exec', 'clean']);
 };

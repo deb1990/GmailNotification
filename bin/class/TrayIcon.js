@@ -6,7 +6,7 @@ var TrayIcon = (function () {
     function TrayIcon(icon, appInstance) {
         var Tray = require('tray');
         var path = require('path');
-        this._instance = new Tray(path.join(__dirname, '../../' + icon));
+        this._instance = new Tray(path.join(__dirname,  '../../../serve/'+ icon));
         this._instance.on('clicked', this.showMail.bind(this));
         this._appInstance = appInstance;
         this._mailWindowInstance = null;
@@ -55,8 +55,10 @@ var TrayIcon = (function () {
     };
     TrayIcon.prototype.showDisplayBallon = function (icon, title, content) {
         if (this._instance) {
+            var path = require('path');
+            console.log(path.join(__dirname,  '../../../serve/'+ icon))
             this._instance.displayBalloon({
-                icon: icon,
+                icon: path.join(__dirname,  '../../../serve/'+ icon),
                 title: title,
                 content: content
             })
