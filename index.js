@@ -1,26 +1,31 @@
 var app = require('app');
 var ipc = require('ipc');
-
 var gmail = require('./bin/gmailNotification.js');
 
+
 app.on('ready', function () {
-    gmail.init();
-    ipc.on('email-count', gmail.emailCount);
+    var exec = require('child_process').exec;
+    exec('netstat -a -n -o | find "12346"', function (error, stdout, stderr) {
+        if (stdout.indexOf('LISTENING') !== -1) {
+            var processID = parseInt(stdout.substr(stdout.indexOf('LISTENING') + 'LISTENING'.length));
+            exec("Taskkill /PID " + processID + " /F", function (error, stdout, stderr) {
+                console.log('taskKilled:' +processID);
+                exec('cd ' + __dirname + ' & http-server -p 12346 -c-1', function (error, stdout, stderr) {
+                });
+                start();
+            });
+        }
+        else {
+            exec('cd ' + __dirname + ' & http-server -p 12346 -c-1', function (error, stdout, stderr) {
+            });
+            start();
+        }
+    });
 });
 
+function start() {
+    gmail.init(app);
+    ipc.on('email-count', gmail.emailCount.bind(gmail));
+    ipc.on('messageinfo_tomain', gmail.showMsgPopUp.bind(gmail));
+}
 
-
-//var express = require('express'),
-//    expr = express(),
-//    port = 8080;
-//
-//expr.use(express.static(__dirname + '/'));
-//expr.listen(port);
-//console.log(__dirname + '/index.html');
-
-
-//var exec = require('child_process').exec;
-//exec('cd '+__dirname+ ' & http-server', function (error, stdout, stderr) {
-//    // output is in stdout
-//    console.log(error, stdout, stderr)
-//});
