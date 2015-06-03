@@ -6,8 +6,8 @@
   "scripts": {
     "start": "electron ."
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Debarshi",
+  "license": "MIT",
   "devDependencies": {
     "asar": "^0.7.1",
     "electron-prebuilt": "^0.26.0",
