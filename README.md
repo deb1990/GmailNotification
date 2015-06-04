@@ -1,4 +1,6 @@
 # Gmail Notification
+
+[![Join the chat at https://gitter.im/raks437/GmailNotification](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/raks437/GmailNotification?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Desktop notification for new emails using Github's Electron API.
 
 ###Quick Start
