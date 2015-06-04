@@ -1,5 +1,5 @@
-# GmailNotification
-Desktop notification for emails using Github Electron API.
+# Gmail Notification
+Desktop notification for new emails using Github's Electron API.
 
 ###Quick Start
 
@@ -11,4 +11,4 @@ You should be able to see *ballon notification*
 1. The **index.html** file polls the **GMAIL API** and **sends async messages** to the main process using **ipc calls**,
 2. The **index.js** is the **main process** which upon receiving messages from **index.html**, shows them using **ballon notification**.
 
-Please suggest any better architecture 
+####Please feel free to suggest any better architecture

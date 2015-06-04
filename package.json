@@ -1,12 +1,12 @@
 {
   "name": "Electron",
   "version": "1.0.0",
-  "description": "",
+  "description": "Desktop notification for new emails using Github's Electron API.",
   "main": "index.js",
   "scripts": {
     "start": "electron ."
   },
-  "author": "Debarshi",
+  "author": "Debarshi Bhaumik",
   "license": "MIT",
   "devDependencies": {
     "asar": "^0.7.1",
